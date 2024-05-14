@@ -1,0 +1,20 @@
+.vscode
+node_modules
+package-lock.json
+
+# Ignore all local configuration files
+*.local.js
+
+# Ignore all files in the .git directory
+.git/
+
+# Ignore all files in the .svn directory
+.svn/
+
+# Ignore all files in the .hg directory
+.hg/
+
+# Ignore all files in the .DS_Store directory
+.DS_Store
+
+# Ignore all files in the .vscode directory

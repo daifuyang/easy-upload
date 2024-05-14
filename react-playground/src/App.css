@@ -1,0 +1,9 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.code-demo {
+  padding: 42px 24px 50px;
+  color: rgba(0, 0, 0, 0.88);
+}

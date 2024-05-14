@@ -1,0 +1,37 @@
+{
+  "name": "@nextcms/easy-upload",
+  "version": "0.0.1",
+  "description": "上传组件，支持图片，视频，音频，和其他文档",
+  "scripts": {
+    "build": "rollup -c",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "上传组件"
+  ],
+  "main": "lib/index.js",
+  "unpkg": "dist/easy-upload.min.js",
+  "module": "es/index.js",
+  "typings": "es/index.d.ts",
+  "files": [
+    "dist",
+    "es",
+    "lib",
+    "locale",
+    "BUG_VERSIONS.json"
+  ],
+  "author": "nextcms",
+  "license": "MIT",
+  "dependencies": {
+    "classnames": "^2.5.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@rollup/plugin-typescript": "^11.1.6",
+    "@types/react": "^18.3.2",
+    "rollup": "^4.17.2",
+    "tslib": "^2.6.2",
+    "typescript": "^5.4.5"
+  }
+}

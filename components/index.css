@@ -1,0 +1,86 @@
+.nextcms-upload-container {
+  color: rgba(0, 0, 0, 0.88);
+  font-size: 14px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+    "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+    "Noto Color Emoji";
+  line-height: 1.5714285714285714;
+  background: #ffffff;
+  -webkit-transition: background-color 1s cubic-bezier(0.075, 0.82, 0.165, 1);
+  transition: background-color 1s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+.nextcms-upload-tabs {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.nextcms-upload-tabs > .nextcms-tabs-nav {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.nextcms-upload-tabs > .nextcms-tabs-nav::before {
+  position: absolute;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  border-bottom: 1px solid #f0f0f0;
+  content: "";
+}
+
+.nextcms-upload-tabs > .nextcms-tabs-nav .nextcms-tabs-ink-bar {
+  position: absolute;
+  background: #1677ff;
+  pointer-events: none;
+  bottom: 0;
+  transition: width 0.3s, left 0.3s, right 0.3s;
+  height: 2px;
+}
+
+.nextcms-upload-tabs > .nextcms-tabs-nav > .nextcms-tabs-nav-wrap {
+  position: relative;
+  display: flex;
+  flex: auto;
+  align-items: stretch;
+  overflow: hidden;
+  white-space: nowrap;
+  transform: translate(0);
+}
+
+.nextcms-upload-tabs > .nextcms-tabs-nav .nextcms-tabs-nav-list {
+  position: relative;
+  display: flex;
+  transition: opacity 0.3s;
+  transform: translate(0px, 0px);
+}
+
+.nextcms-upload-tabs .nextcms-tabs-tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 12px 0;
+  font-size: 14px;
+  background: transparent;
+  border: 0;
+  outline: none;
+  cursor: pointer;
+  color: rgba(0, 0, 0, 0.88);
+  user-select: none;
+}
+
+.nextcms-upload-tabs .nextcms-tabs-tab-btn {
+  outline: none;
+  transition: all 0.3s;
+}
+
+.nextcms-upload-tabs .nextcms-tabs-tab.nextcms-tabs-tab-active .nextcms-tabs-tab-btn {
+  color: #1677ff;
+  text-shadow: 0 0 0.25px currentcolor;
+}
