@@ -1,9 +1,16 @@
+html, body, #root {
+  height: 100%;
+}
+
 .container {
   max-width: 1200px;
   margin: 0 auto;
+  height: 100%;
 }
 
 .code-demo {
+  box-sizing: border-box;
+  height: 100%;
   padding: 42px 24px 50px;
   color: rgba(0, 0, 0, 0.88);
 }

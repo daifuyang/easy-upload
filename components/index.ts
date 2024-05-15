@@ -1,2 +1,2 @@
 import './index.css';
-export { default as UploadModal } from "./uploadModal";
+export { default as Assets } from "./assets";
