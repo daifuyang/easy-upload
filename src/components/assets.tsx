@@ -49,7 +49,7 @@ export default function Assets(props: UploadModalProps) {
       <div className="nextcms-upload-container">
         <Tabs onChange={(key: string) => setActive(key)} defaultActiveKey="images" items={items} />
         <div className="nextcms-upload-content">
-          <Category />
+           <Category />
           <div className="nextcms-upload-list">
             <div className="nextcms-upload-list-header">
               <div className="nextcms-upload-list-header-top">

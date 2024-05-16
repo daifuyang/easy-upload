@@ -24,7 +24,6 @@ const ChooseModal = forwardRef<ChooseModalRef, ChooseModalProps>((props, ref) =>
 
   useImperativeHandle(ref, () => ({
     open(data) {
-      console.log("data", data);
       if (data?.title) {
         setTitle(data.title);
       }

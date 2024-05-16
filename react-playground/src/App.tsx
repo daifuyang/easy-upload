@@ -14,7 +14,7 @@ function App() {
       <ChooseModal ref={chooseRef} />
       <div className="container">
         <div className="code-demo">
-          <div
+          {/* <div
             style={{
               marginBottom: "24px"
             }}
@@ -22,7 +22,7 @@ function App() {
             <Button onClick={ () => {
               chooseRef.current?.open({title:"选择图片"})
             } }>选择器</Button>
-          </div>
+          </div> */}
           <Assets />
         </div>
       </div>

@@ -10,8 +10,8 @@ export default function List(props) {
             // 生成10个空数组
             new Array(10).fill(0).map((_, index) => (
               <Col key={index} flex={"20%"}>
-                <div className="nextcms-upload-list-menu-assets-item">
-                  <div className="nextcms-upload-list-menu-assets-item-image">
+                <div className="nextcms-upload-list-assets-item">
+                  <div className="nextcms-upload-list-assets-item-image">
                     <div className="img-wrap">
                       <Image
                         width={"100%"}

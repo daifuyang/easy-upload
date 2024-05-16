@@ -66,6 +66,7 @@
 .nextcms-upload-list-container > .nextcms-upload-list-assets {
   flex: 1;
   height: 0;
+  margin-bottom: 16px;
   overflow-x: hidden;
   overflow-y: auto;
   box-sizing: border-box;
