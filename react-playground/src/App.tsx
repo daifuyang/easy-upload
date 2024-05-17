@@ -23,7 +23,12 @@ function App() {
               chooseRef.current?.open({title:"选择图片"})
             } }>选择器</Button>
           </div> */}
-          <Assets />
+          <Assets listRequest={ async () => {
+            return {
+              data: new Array(10).fill(0),
+              success: true
+            }
+          } } />
         </div>
       </div>
     </ConfigProvider>

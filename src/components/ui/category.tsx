@@ -4,7 +4,7 @@ import type { TreeProps } from 'antd';
 import React from "react";
 
 interface CategoryProps {
-  onCategorySearch: (value: string) => void;
+  
 }
 
 const treeData: any[] = [
@@ -70,7 +70,7 @@ const treeData: any[] = [
 ];
 
 export default function Category(props: CategoryProps) {
-  const { onCategorySearch } = props;
+  
 
   const onDragEnter: TreeProps['onDragEnter'] = (info) => {
     console.log(info);

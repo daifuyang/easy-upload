@@ -1,4 +1,4 @@
-import React, { forwardRef, useImperativeHandle, useState } from "react";
+import React, { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import { Col, Form, Modal, Row, Select, Upload, Image } from "antd";
 import type { GetProp, UploadFile, UploadProps } from "antd";
 import {
@@ -16,6 +16,7 @@ type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 interface UploadModalProps {
   active: string;
   accept?: string;
+  onFinish?: (values: any, fileList: UploadFile[]) => void;
   onCancel?: () => void;
   onOk?: () => void;
 }
@@ -30,7 +31,10 @@ export interface UploadModalRef {
 }
 
 const UploadModal = forwardRef<UploadModalRef, UploadModalProps>((props, ref) => {
-  const { active, accept } = props;
+  const { active, accept, onFinish } = props;
+
+  const [form] = Form.useForm();
+
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("上传");
   const [fileList, setFileList] = useState<UploadFile[]>([]);
@@ -170,12 +174,22 @@ const UploadModal = forwardRef<UploadModalRef, UploadModalProps>((props, ref) =>
       open={open}
       cancelText="取消"
       okText="上传"
+      onOk={() => {
+        form.submit();
+      }}
       onCancel={() => {
         onClose();
       }}
     >
-      <Form>
-        <Form.Item label="上传到">
+      <Form
+        form={form}
+        onFinish={(values) => {
+          if (onFinish) {
+            onFinish(values, fileList);
+          }
+        }}
+      >
+        <Form.Item name="categoryId" label="上传到">
           <Select
             style={{
               width: 300
