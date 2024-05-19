@@ -1,4 +1,4 @@
-import React, { forwardRef, useImperativeHandle, useRef, useState } from "react";
+import React, { forwardRef, useImperativeHandle, useState } from "react";
 import { Col, Form, Modal, Row, Select, Upload, Image } from "antd";
 import type { GetProp, UploadFile, UploadProps } from "antd";
 import {
@@ -16,7 +16,7 @@ type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 interface UploadModalProps {
   active: string;
   accept?: string;
-  onFinish?: (values: any, fileList: UploadFile[]) => void;
+  onFinish?: (values: any, fileList: UploadFile[]) => Promise<any>;
   onCancel?: () => void;
   onOk?: () => void;
 }
@@ -39,22 +39,22 @@ const UploadModal = forwardRef<UploadModalRef, UploadModalProps>((props, ref) =>
   const [title, setTitle] = useState("上传");
   const [fileList, setFileList] = useState<UploadFile[]>([]);
 
-  const onClose = () => {
-    const next = () => {
-      setFileList([]);
-      setTitle("");
-      setOpen(false);
-    };
+  const onCancel = () => {
+    setFileList([]);
+    setTitle("");
+    setOpen(false);
+  };
 
+  const onClose = () => {
     if (fileList?.length > 0) {
       Modal.confirm({
         title: "警告",
         content: "您还未保存上传的文件，退出将不会保存，是否确认退出？",
         centered: true,
-        onOk: next
+        onOk: onCancel
       });
     } else {
-      next();
+      onCancel();
     }
   };
 
@@ -87,7 +87,7 @@ const UploadModal = forwardRef<UploadModalRef, UploadModalProps>((props, ref) =>
     };
 
     switch (active) {
-      case "images":
+      case "image":
         return (
           fileList?.length > 0 && (
             <div className="upload-list">
@@ -183,9 +183,16 @@ const UploadModal = forwardRef<UploadModalRef, UploadModalProps>((props, ref) =>
     >
       <Form
         form={form}
-        onFinish={(values) => {
+        onFinish={(values: any) => {
+          let params = {
+            type: active
+          };
           if (onFinish) {
-            onFinish(values, fileList);
+            onFinish(params, fileList).then((res) => {
+              if (res) {
+                onCancel();
+              }
+            });
           }
         }}
       >

@@ -1,7 +1,7 @@
 .nextcms-upload-container {
   height: 100%;
-  padding: 0 16px 16px;
-  display: flex;
+    padding: 0 16px 16px;
+display: flex;
   flex-direction: column;
   color: rgba(0, 0, 0, 0.88);
   font-size: 14px;
@@ -65,7 +65,7 @@
 }
 
 .nextcms-upload-list-container > .nextcms-upload-list-assets {
-  flex: 1;
+  flex: 1 1 0;
   height: 0;
   margin-bottom: 16px;
   overflow-x: hidden;
@@ -128,7 +128,6 @@
   color: #fff;
   background-color: rgba(0, 0, 0, 0.3);
   padding: 4px;
-  box-sizing: border-box;
 
     /* 超过一行显示省略号 */
     white-space: nowrap;

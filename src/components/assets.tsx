@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import zhCN from "antd/locale/zh_CN";
-import { Button, ConfigProvider, Tabs } from "antd";
+import { Button, ConfigProvider, Tabs, message } from "antd";
 import type { GetProp, UploadProps } from "antd";
 import UploadModal, { UploadModalRef } from "./uploadModal";
 import Category from "./ui/category";
@@ -28,14 +28,14 @@ export type UploadModalProps<DataSource, U> = {
 };
 
 const tabsTitleMap: any = {
-  images: "图片",
+  image: "图片",
   audio: "音频",
   video: "视频",
   file: "文件"
 };
 
 const defaultAcceptMap: any = {
-  images: "jpg,jpeg,png,gif,bmp",
+  image: "jpg,jpeg,png,gif,bmp",
   audio: "m4a,mp3",
   video: "mp4,avi,wmv,mov,flv,rmvb,3gp,m4v,mkv,webm",
   file: "pptx,ppt,docx,doc,xls,xlsx,pdf,csv,xlsm,txt"
@@ -45,16 +45,12 @@ const Assets = <T extends Record<string, any>, U extends Record<string, any>>(
   props: UploadModalProps<T, U>
 ) => {
   const { listRequest, uploadRequest } = props;
-
-  const [active, setActive] = useState<string>("images");
-
+  const [active, setActive] = useState<string>("image");
   const [list, setList] = useState<T[] | undefined>([]);
-
   const modalRef = useRef<UploadModalRef>(null);
-
   const items = [
     {
-      key: "images",
+      key: "image",
       label: "图片"
     },
     {
@@ -76,7 +72,6 @@ const Assets = <T extends Record<string, any>, U extends Record<string, any>>(
     return async (pageParams?: Record<string, any>) => {
       const actionParams = { ...(pageParams || {}) };
       const response = await listRequest(actionParams as unknown as U);
-      console.log("response", response);
       if (response.success) {
         setList(response.data);
       }
@@ -105,17 +100,23 @@ const Assets = <T extends Record<string, any>, U extends Record<string, any>>(
   return (
     <ConfigProvider locale={zhCN}>
       <UploadModal
-        onFinish={async (values = [], fileList = []) => {
+        onFinish={async (values = {}, fileList = []) => {
           if (!uploadRequest) return undefined;
-
           const formData = new FormData();
           fileList?.forEach((file) => {
             formData.append("files[]", file as FileType);
           });
-     
+          for (const key in values) {
+            const element = values[key];
+            formData.append(key, element);
+          }
           const res = await uploadRequest(formData);
+          if (!res.success) {
+            message.error(res.msg);
+            return false
+          }
 
-          console.log('res',res)
+          return true
 
         }}
         accept={defaultAcceptMap[active]}
@@ -123,7 +124,7 @@ const Assets = <T extends Record<string, any>, U extends Record<string, any>>(
         ref={modalRef}
       />
       <div className="nextcms-upload-container">
-        <Tabs onChange={(key: string) => setActive(key)} defaultActiveKey="images" items={items} />
+        <Tabs onChange={(key: string) => setActive(key)} defaultActiveKey="image" items={items} />
         <div className="nextcms-upload-content">
           <Category />
           <div className="nextcms-upload-list">
