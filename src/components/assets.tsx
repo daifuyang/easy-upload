@@ -1,10 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import zhCN from "antd/locale/zh_CN";
 import { Button, ConfigProvider, Tabs, message } from "antd";
-import type { GetProp, UploadProps } from "antd";
+import type { GetProp, UploadProps, ColProps, PaginationProps } from "antd";
 import UploadModal, { UploadModalRef } from "./uploadModal";
 import Category from "./ui/category";
 import List from "./ui/list";
+import { Gutter } from "antd/es/grid/row";
+import { PaginationConfigProps } from "./typing";
 
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 
@@ -23,8 +25,14 @@ export type UploadModalProps<DataSource, U> = {
       keyword?: string;
     }
   ) => Promise<Partial<RequestData<DataSource>>>;
-
   uploadRequest?: (params: any) => Promise<Partial<RequestData<DataSource>>>;
+
+  /** 栅格布局宽度，24 栅格，支持指定宽度或百分，需要支持响应式 colSpan={{ xs: 12, sm: 6 }} */
+  colSpan?: ColProps;
+
+  /** 栅格间距 */
+  gutter?: Gutter | [Gutter, Gutter];
+  pagination?: false | PaginationProps;
 };
 
 const tabsTitleMap: any = {
@@ -44,9 +52,22 @@ const defaultAcceptMap: any = {
 const Assets = <T extends Record<string, any>, U extends Record<string, any>>(
   props: UploadModalProps<T, U>
 ) => {
-  const { listRequest, uploadRequest } = props;
+  const {
+    listRequest,
+    uploadRequest,
+    gutter,
+    colSpan,
+    pagination: paginationConfig = false
+  } = props;
   const [active, setActive] = useState<string>("image");
-  const [list, setList] = useState<T[] | undefined>([]);
+  const [list, setList] = useState<T[]>([]);
+
+  const [pagination, setPagination] = useState<PaginationProps>({
+    current: 1,
+    total: 0,
+    pageSize: 10
+  });
+
   const modalRef = useRef<UploadModalRef>(null);
   const items = [
     {
@@ -70,14 +91,46 @@ const Assets = <T extends Record<string, any>, U extends Record<string, any>>(
   const fetchData = useMemo(() => {
     if (!listRequest) return undefined;
     return async (pageParams?: Record<string, any>) => {
-      const actionParams = { ...(pageParams || {}) };
+      const actionParams = {
+        ...(pageParams || {
+          current: pagination.current,
+          pageSize: pagination.pageSize
+        })
+      };
       const response = await listRequest(actionParams as unknown as U);
       if (response.success) {
-        setList(response.data);
+        setList(response.data || []);
+        if(response.total) {
+          setPagination( (prev) => ({...prev, total: response.total}) );
+        }
       }
       return response as RequestData<T>;
     };
-  }, [listRequest]);
+  }, [listRequest, pagination]);
+
+  // 用户传入的，手动覆盖
+  useEffect(() => {
+    if (paginationConfig) {
+      const _pagination: PaginationProps = {
+        current: 1,
+        pageSize: 10,
+        total: 0}
+      if(paginationConfig.current) {
+        _pagination.current = paginationConfig.current;
+      }
+      if(paginationConfig.pageSize) {
+        _pagination.pageSize = paginationConfig.pageSize;
+      }
+      if(paginationConfig.total) {
+        _pagination.total = paginationConfig.total;
+      }
+      setPagination(_pagination)
+    }
+  }, [paginationConfig]);
+
+  useEffect( () => {
+    fetchData?.();
+  } ,[pagination.current, pagination.pageSize])
 
   /** 聚焦的时候重新请求数据，这样可以保证数据都是最新的。 */
   useEffect(() => {
@@ -91,12 +144,11 @@ const Assets = <T extends Record<string, any>, U extends Record<string, any>>(
       }
     };
 
-    visibilitychange();
-
     document.addEventListener("visibilitychange", visibilitychange);
     return () => document.removeEventListener("visibilitychange", visibilitychange);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
   return (
     <ConfigProvider locale={zhCN}>
       <UploadModal
@@ -113,11 +165,10 @@ const Assets = <T extends Record<string, any>, U extends Record<string, any>>(
           const res = await uploadRequest(formData);
           if (!res.success) {
             message.error(res.msg);
-            return false
+            return false;
           }
 
-          return true
-
+          return true;
         }}
         accept={defaultAcceptMap[active]}
         active={active}
@@ -145,7 +196,17 @@ const Assets = <T extends Record<string, any>, U extends Record<string, any>>(
                 <div className="nextcms-upload-list-menu-count">素材总量：0</div>
               </div>
             </div>
-            <List list={list} active={active} />
+            <List
+              list={list}
+              active={active}
+              gutter={gutter}
+              colSpan={colSpan}
+              onChange={(page, pageSize) => {
+                if(paginationConfig) return undefined
+                setPagination((prev) => ({ ...prev, current: page, pageSize }));
+              }}
+              pagination={pagination}
+            />
           </div>
         </div>
       </div>
