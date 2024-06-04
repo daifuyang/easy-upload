@@ -1,10 +1,11 @@
 import { SearchOutlined } from "@ant-design/icons";
-import { Input, Tree } from "antd";
+import { Input, Tree, Skeleton } from "antd";
 import type { TreeProps } from 'antd';
 import React from "react";
 
 interface CategoryProps {
-  
+  data: any[]
+  loading:boolean
 }
 
 const treeData: any[] = [
@@ -71,6 +72,7 @@ const treeData: any[] = [
 
 export default function Category(props: CategoryProps) {
   
+  const {data,loading, ...otherProps} = props
 
   const onDragEnter: TreeProps['onDragEnter'] = (info) => {
     console.log(info);
@@ -89,7 +91,7 @@ export default function Category(props: CategoryProps) {
           onChange={(e) => {
             const { value } = e.target;
             if (value) {
-              onCategorySearch(value);
+              // onCategorySearch(value);
             }
           }}
           suffix={<SearchOutlined />}
@@ -97,8 +99,7 @@ export default function Category(props: CategoryProps) {
         />
       </div>
       <div className="nextcms-upload-category-content">
-        <Tree defaultExpandAll treeData={treeData}  className="draggable-tree" draggable blockNode onDragEnter={onDragEnter}
-      onDrop={onDrop} />
+        { loading ? <Skeleton /> : <Tree defaultExpandAll treeData={data || []} {...otherProps} className="draggable-tree" draggable blockNode onDragEnter={onDragEnter} onDrop={onDrop} />}
       </div>
     </div>
   );

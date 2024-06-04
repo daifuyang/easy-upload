@@ -6,7 +6,6 @@ import UploadModal, { UploadModalRef } from "./uploadModal";
 import Category from "./ui/category";
 import List from "./ui/list";
 import { Gutter } from "antd/es/grid/row";
-import { PaginationConfigProps } from "./typing";
 
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 
@@ -26,6 +25,10 @@ export type UploadModalProps<DataSource, U> = {
     }
   ) => Promise<Partial<RequestData<DataSource>>>;
   uploadRequest?: (params: any) => Promise<Partial<RequestData<DataSource>>>;
+  categoryRequest?: (params: any) => Promise<Partial<RequestData<DataSource>>>;
+  deleteRequest?: (params: any) => Promise<Partial<RequestData<DataSource>>>;
+  uploadProps?: any;
+  categoryProps?: any;
 
   /** 栅格布局宽度，24 栅格，支持指定宽度或百分，需要支持响应式 colSpan={{ xs: 12, sm: 6 }} */
   colSpan?: ColProps;
@@ -55,18 +58,22 @@ const Assets = <T extends Record<string, any>, U extends Record<string, any>>(
   const {
     listRequest,
     uploadRequest,
+    categoryRequest,
+    deleteRequest,
+    uploadProps = {},
+    categoryProps = {},
     gutter,
     colSpan,
     pagination: paginationConfig = false
   } = props;
   const [active, setActive] = useState<string>("image");
   const [list, setList] = useState<T[]>([]);
+  const [category, setCategory] = useState<T[]>([]);
+  // const [loading, setLoading] = useState(true);
+  const [categoryLoading, setCategoryLoading] = useState(true);
+  const [listLoading, setListLoading] = useState(true);
 
-  const [pagination, setPagination] = useState<PaginationProps>({
-    current: 1,
-    total: 0,
-    pageSize: 10
-  });
+  const [pagination, setPagination] = useState<PaginationProps>();
 
   const modalRef = useRef<UploadModalRef>(null);
   const items = [
@@ -91,46 +98,84 @@ const Assets = <T extends Record<string, any>, U extends Record<string, any>>(
   const fetchData = useMemo(() => {
     if (!listRequest) return undefined;
     return async (pageParams?: Record<string, any>) => {
-      const actionParams = {
-        ...(pageParams || {
-          current: pagination.current,
-          pageSize: pagination.pageSize
-        })
+      const _pagination = {
+        current: pageParams?.current || 1,
+        pageSize: pageParams?.pageSize || 10
       };
+
+      const actionParams = {
+        ...pageParams,
+        ..._pagination,
+        type: active
+      };
+      setListLoading(true);
       const response = await listRequest(actionParams as unknown as U);
       if (response.success) {
         setList(response.data || []);
-        if(response.total) {
-          setPagination( (prev) => ({...prev, total: response.total}) );
+        if (response.total) {
+          setPagination({ ..._pagination, total: response.total });
         }
+      }
+      setListLoading(false);
+      return response as RequestData<T>;
+    };
+  }, [listRequest, pagination, active]);
+
+  const fetchCategory = useMemo(() => {
+    if (!categoryRequest) return undefined;
+    return async (pageParams?: Record<string, any>) => {
+      const actionParams = {
+        ...(pageParams || {
+          pageSize: 0
+        })
+      };
+      setCategoryLoading(true);
+      const response = await categoryRequest(actionParams as unknown as U);
+      if (response.success) {
+        setCategory(response.data || []);
+      }
+      setCategoryLoading(false);
+      return response as RequestData<T>;
+    };
+  }, [categoryRequest]);
+
+  const deleteAsset = useMemo(() => {
+    if (!deleteRequest) return undefined;
+    return async (id: number) => {
+      const response = await deleteRequest(id);
+      if (response.success) {
+        message.success("删除成功");
+        fetchData?.(pagination);
       }
       return response as RequestData<T>;
     };
-  }, [listRequest, pagination]);
+  }, [deleteRequest, pagination]);
 
   // 用户传入的，手动覆盖
   useEffect(() => {
+    const _pagination: PaginationProps = {
+      current: 1,
+      pageSize: 10,
+      total: 0
+    };
     if (paginationConfig) {
-      const _pagination: PaginationProps = {
-        current: 1,
-        pageSize: 10,
-        total: 0}
-      if(paginationConfig.current) {
+      if (paginationConfig.current) {
         _pagination.current = paginationConfig.current;
       }
-      if(paginationConfig.pageSize) {
+      if (paginationConfig.pageSize) {
         _pagination.pageSize = paginationConfig.pageSize;
       }
-      if(paginationConfig.total) {
+      if (paginationConfig.total) {
         _pagination.total = paginationConfig.total;
       }
-      setPagination(_pagination)
     }
-  }, [paginationConfig]);
+    fetchData?.(_pagination);
+    setPagination(_pagination);
+  }, [paginationConfig, active]);
 
-  useEffect( () => {
-    fetchData?.();
-  } ,[pagination.current, pagination.pageSize])
+  useEffect(() => {
+    fetchCategory?.();
+  }, []);
 
   /** 聚焦的时候重新请求数据，这样可以保证数据都是最新的。 */
   useEffect(() => {
@@ -140,18 +185,21 @@ const Assets = <T extends Record<string, any>, U extends Record<string, any>>(
     // 聚焦时重新请求事件
     const visibilitychange = () => {
       if (document.visibilityState === "visible") {
-        fetchData?.();
+        fetchData?.(pagination);
+        fetchCategory?.();
       }
     };
 
     document.addEventListener("visibilitychange", visibilitychange);
     return () => document.removeEventListener("visibilitychange", visibilitychange);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [pagination]);
 
   return (
     <ConfigProvider locale={zhCN}>
       <UploadModal
+        uploadProps={uploadProps}
+        category={category}
         onFinish={async (values = {}, fileList = []) => {
           if (!uploadRequest) return undefined;
           const formData = new FormData();
@@ -167,7 +215,7 @@ const Assets = <T extends Record<string, any>, U extends Record<string, any>>(
             message.error(res.msg);
             return false;
           }
-
+          fetchData?.(pagination);
           return true;
         }}
         accept={defaultAcceptMap[active]}
@@ -177,7 +225,8 @@ const Assets = <T extends Record<string, any>, U extends Record<string, any>>(
       <div className="nextcms-upload-container">
         <Tabs onChange={(key: string) => setActive(key)} defaultActiveKey="image" items={items} />
         <div className="nextcms-upload-content">
-          <Category />
+          <Category {...categoryProps} loading={categoryLoading} data={category} />
+
           <div className="nextcms-upload-list">
             <div className="nextcms-upload-list-header">
               <div className="nextcms-upload-list-header-top">
@@ -196,16 +245,25 @@ const Assets = <T extends Record<string, any>, U extends Record<string, any>>(
                 <div className="nextcms-upload-list-menu-count">素材总量：0</div>
               </div>
             </div>
+
             <List
               list={list}
               active={active}
               gutter={gutter}
               colSpan={colSpan}
+              onDelete={async (id: number) => {
+                const res: any = await deleteAsset?.(id);
+                if (!res.success) {
+                  message.error(res.msg);
+                }
+                fetchData?.(pagination);
+              }}
               onChange={(page, pageSize) => {
-                if(paginationConfig) return undefined
+                fetchData?.({ current: page, pageSize });
                 setPagination((prev) => ({ ...prev, current: page, pageSize }));
               }}
               pagination={pagination}
+              loading={listLoading}
             />
           </div>
         </div>

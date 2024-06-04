@@ -1,5 +1,5 @@
 import React, { forwardRef, useImperativeHandle, useState } from "react";
-import { Col, Form, Modal, Row, Select, Upload, Image } from "antd";
+import { Col, Form, Modal, Row, Select, Upload, Image, TreeSelect } from "antd";
 import type { GetProp, UploadFile, UploadProps } from "antd";
 import {
   CloseCircleOutlined,
@@ -8,6 +8,7 @@ import {
   UploadOutlined
 } from "@ant-design/icons";
 import { getBase64 } from "../utils/util";
+import { preview } from "./ui/preview";
 
 const { Dragger } = Upload;
 
@@ -17,6 +18,8 @@ interface UploadModalProps {
   active: string;
   accept?: string;
   onFinish?: (values: any, fileList: UploadFile[]) => Promise<any>;
+  category?: any[];
+  uploadProps?: any;
   onCancel?: () => void;
   onOk?: () => void;
 }
@@ -31,10 +34,10 @@ export interface UploadModalRef {
 }
 
 const UploadModal = forwardRef<UploadModalRef, UploadModalProps>((props, ref) => {
-  const { active, accept, onFinish } = props;
+  const { active, accept, category, uploadProps = {}, onFinish } = props;
+  const {fieldNames} = uploadProps
 
   const [form] = Form.useForm();
-
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("上传");
   const [fileList, setFileList] = useState<UploadFile[]>([]);
@@ -77,15 +80,6 @@ const UploadModal = forwardRef<UploadModalRef, UploadModalProps>((props, ref) =>
       setFileList(newFileList);
     };
 
-    const previewContent = (file: UploadFile) => {
-      switch (active) {
-        case "audio":
-          return <audio style={{ width: "100%" }} src={file.preview} controls />;
-        case "video":
-          return <video style={{ width: "100%" }} src={file.preview} controls />;
-      }
-    };
-
     switch (active) {
       case "image":
         return (
@@ -94,7 +88,7 @@ const UploadModal = forwardRef<UploadModalRef, UploadModalProps>((props, ref) =>
               <Row gutter={[24, 24]}>
                 {fileList?.map((file, index) => {
                   return (
-                    <Col key={file.uid} flex="20%">
+                    <Col key={file.uid} span={6}>
                       <div className="nextcms-upload-list-assets-item">
                         <div className="nextcms-upload-list-assets-item-image">
                           <div className="img-wrap">
@@ -122,31 +116,25 @@ const UploadModal = forwardRef<UploadModalRef, UploadModalProps>((props, ref) =>
         return (
           fileList?.length > 0 && (
             <div className="upload-list">
-              {fileList?.map((file, index) => {
+              {fileList?.map((file: any, index) => {
                 return (
-                  <div
-                    onClick={() => {
-                      Modal.info({
-                        title: "预览",
-                        icon: <></>,
-                        width: 750,
-                        centered: true,
-
-                        content: <div>{previewContent(file)}</div>,
-                        closable: true,
-                        footer: false
-                      });
-                    }}
-                    className="nextcms-upload-list-assets-item-file-wrap"
-                  >
+                  <div className="nextcms-upload-modal-list-assets-item-file-wrap">
                     <div
                       style={{ marginRight: 12 }}
-                      className="nextcms-upload-list-assets-item-file"
+                      className="nextcms-upload-modal-list-assets-item-file"
                     >
                       {file.name}
                     </div>
                     {["audio", "video"].includes(active) && (
-                      <PlayCircleOutlined style={{ marginRight: 12 }} />
+                      <PlayCircleOutlined
+                        onClick={() => {
+                          preview({
+                            active,
+                            preview: file.preview
+                          });
+                        }}
+                        style={{ marginRight: 12 }}
+                      />
                     )}
                     <DeleteOutlined
                       onClick={(e) => {
@@ -197,16 +185,13 @@ const UploadModal = forwardRef<UploadModalRef, UploadModalProps>((props, ref) =>
         }}
       >
         <Form.Item name="categoryId" label="上传到">
-          <Select
+          <TreeSelect
             style={{
               width: 300
             }}
-            options={[
-              {
-                label: "测试",
-                value: "test"
-              }
-            ]}
+            defaultValue={1}
+            treeData={category}
+            fieldNames={fieldNames}
           />
         </Form.Item>
       </Form>

@@ -1,7 +1,7 @@
 .nextcms-upload-container {
   height: 100%;
-    padding: 0 16px 16px;
-display: flex;
+  padding: 0 16px 16px;
+  display: flex;
   flex-direction: column;
   color: rgba(0, 0, 0, 0.88);
   font-size: 14px;
@@ -78,7 +78,7 @@ display: flex;
   width: 100%;
 }
 
-.nextcms-upload-list-assets-item-image {
+.nextcms-upload-list-assets-item-asset {
   user-select: none;
   width: 100%;
   position: relative;
@@ -92,7 +92,7 @@ display: flex;
   cursor: pointer;
 }
 
-.nextcms-upload-list-assets-item-close .anticon  {
+.nextcms-upload-list-assets-item-close .anticon {
   color: #ff4d4f;
   font-size: 18px;
 }
@@ -117,26 +117,54 @@ display: flex;
   object-fit: cover;
 }
 
-.nextcms-upload-list-assets-item-image > .name {
+.nextcms-upload-list-assets-item-asset > .nextcms-upload-list-assets-item-action {
+  display: none;
+  position: absolute;
+  z-index: 10;
+  right: 0;
+  top: 0;
+}
+
+.nextcms-upload-list-assets-item-asset > .nextcms-upload-list-assets-item-action > .nextcms-upload-list-assets-item-action-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  margin: 6px;
+  border-radius: 50%;
+  background-color: #fff;
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 12px 0px;
+}
+
+.nextcms-upload-list-assets-item-asset:hover > .nextcms-upload-list-assets-item-action,
+.nextcms-upload-list-assets-item-asset > .nextcms-upload-list-assets-item-action-active {
+  display: block;
+}
+
+.nextcms-upload-list-assets-item-asset > .nextcms-upload-list-assets-item-action .anticon {
+  font-size: 26px;
+}
+
+.nextcms-upload-list-assets-item-asset > .name, .nextcms-upload-list-assets-item-image > .name {
   position: absolute;
   left: 0;
   bottom: 0;
-  z-index: 99;
+  z-index: 9;
   width: 100%;
-  
+
   text-align: center;
   color: #fff;
   background-color: rgba(0, 0, 0, 0.3);
   padding: 4px;
 
-    /* 超过一行显示省略号 */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-
+  /* 超过一行显示省略号 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.nextcms-upload-list-assets-item-image > .name > .ant-typography {
+.nextcms-upload-list-assets-item-asset > .name > .ant-typography {
   display: inline-block;
   max-width: 100%;
   overflow: hidden;
@@ -144,17 +172,28 @@ display: flex;
   white-space: nowrap;
 }
 
-.nextcms-upload-list-assets-item-file-wrap {
+.nextcms-upload-list-assets-item-asset > .icon-wrap {
+  width: 100%;
+  text-align: center;
+  padding-bottom: 24px;
+}
+
+.nextcms-upload-list-assets-item-asset > .icon-wrap > .anticon {
+  font-size: 48px;
+  padding: 24px;
+}
+
+.nextcms-upload-modal-list-assets-item-file-wrap {
   display: flex;
   align-items: center;
   margin-bottom: 16px;
 }
 
-.nextcms-upload-list-assets-item-file-wrap:last-child {
+.nextcms-upload-modal-list-assets-item-file-wrap:last-child {
   margin-bottom: 0;
 }
 
-.nextcms-upload-list-assets-item-file {
+.nextcms-upload-modal-list-assets-item-file {
   color: #1677ff;
   cursor: pointer;
   margin-right: 4px;
@@ -164,7 +203,7 @@ display: flex;
   white-space: nowrap;
 }
 
-.nextcms-upload-list-assets-item-file > .ant-typography {
+.nextcms-upload-modal-list-assets-item-file > .ant-typography {
   display: inline-block;
   max-width: 100%;
   overflow: hidden;
@@ -172,10 +211,10 @@ display: flex;
   white-space: nowrap;
 }
 
-.nextcms-upload-list-assets-item-file-wrap  > .anticon {
+.nextcms-upload-modal-list-assets-item-file-wrap > .anticon {
   cursor: pointer;
   color: #1677ff;
-  font-size: 18px;  
+  font-size: 18px;
 }
 
 .nextcms-upload-list-assets-pagination {
